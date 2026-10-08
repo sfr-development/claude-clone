@@ -87,7 +87,7 @@ Then open the new **Claude (account2)** shortcut and sign in with the second acc
 </table>
 
 ```text
-  claude-clone  v1.1.0  -  several Claude accounts side by side
+  claude-clone  v1.2.0  -  several Claude accounts side by side
   ------------------------------------------------------------
 
   Looking for Claude on this machine
@@ -102,6 +102,40 @@ Then open the new **Claude (account2)** shortcut and sign in with the second acc
   Name for clone 2 [account3] client-a
   ...
 ```
+
+## Dashboard
+
+Run the PowerShell script without options and it opens a small dashboard right in the terminal (macOS/Linux: `--list` shows the same status table): what is installed,
+every clone with its status (running, signed in, not signed in, missing folder) and when it was last used -
+plus profiles that something else started with `--user-data-dir`. Navigate with the arrow keys or press
+a number.
+
+```text
+  ╭────────────────────────────────────────────────────────────────────────────╮
+  │ claude-clone v1.2.0                   several Claude accounts side by side │
+  ╰────────────────────────────────────────────────────────────────────────────╯
+
+  INSTALLED
+    ● Claude Desktop  Microsoft Store   2.26454.2.0
+    ● Claude Code     2.1.293  (bundled with Claude Desktop)
+
+  YOUR CLONES (3)
+      NAME          APP      STATUS         LAST USED  FOLDER
+    ● work          Desktop  running        just now   ~\.claude-clone\profiles\Claude-work
+    ● client-a      Desktop  signed in      2 h ago    ~\.claude-clone\profiles\Claude-client-a
+    ○ personal      Code     not signed in  -          ~\.claude-personal
+
+  What would you like to do?
+   › Launch a clone
+     Create new clones
+     Remove a clone
+     Repair shortcuts
+     Open a profile folder
+     Quit
+```
+
+On Windows, clones you created by hand or with an older version are found automatically and added to the list.
+Status checks only look at *whether* a login exists - never at its contents.
 
 ## What you get
 
@@ -131,7 +165,9 @@ A list of all clones is kept in `~/.claude-clone/`.
 | `-NoMainShortcut` | `--no-main-shortcut` | No extra shortcut for the main account |
 | `-NoPath` | | Do not add the command folder to `PATH` (Windows) |
 | `-Yes` | `--yes` | Accept all defaults, no questions |
-| `-List` | `--list` | List clones |
+| `-List` | `--list` | List clones with their status |
+| `-Launch work` | `--launch work` | Start a clone |
+| `-Repair` | | Re-create all shortcuts and icons (Windows) |
 | `-Remove work` | `--remove work` | Remove shortcuts and launchers of a clone |
 | `-Remove work -Purge` | `--remove work --purge` | ... and delete its profile (signs it out) |
 

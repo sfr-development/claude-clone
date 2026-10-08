@@ -12,11 +12,11 @@
 
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 OS="$(uname -s)"
 
 PRODUCT=""; COUNT=""; NAMES=""; BASE_PATH=""
-SHARE=1; COPY=1; SHORTCUTS=1; MAIN_SHORTCUT=1; YES=0; LIST=0; REMOVE=""; PURGE=0
+SHARE=1; COPY=1; SHORTCUTS=1; MAIN_SHORTCUT=1; YES=0; LIST=0; REMOVE=""; PURGE=0; LAUNCH=""
 
 usage() {
   cat <<'EOF'
@@ -33,7 +33,8 @@ Options:
   --no-copy-settings            do not copy MCP config / CLAUDE.md / skills
   --no-shortcuts                no launchers on the desktop / in the app menu
   --no-main-shortcut            no extra launcher for the main account
-  --list                        list clones
+  --list                        list clones with their status (signed in, running)
+  --launch NAME                 start a clone
   --remove NAME                 remove a clone (shortcuts and launchers)
   --purge                       with --remove: also delete the profile folder
   --yes                         accept all defaults, no questions
@@ -53,6 +54,7 @@ while [ $# -gt 0 ]; do
     --list) LIST=1; shift ;;
     --remove) REMOVE="$2"; shift 2 ;;
     --purge) PURGE=1; shift ;;
+    --launch) LAUNCH="$2"; shift 2 ;;
     --yes|-y) YES=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage; exit 2 ;;
@@ -327,10 +329,50 @@ main_shortcuts() { # do_desktop do_code
 # ------------------------------------------------------------------------------------------
 # List / remove
 # ------------------------------------------------------------------------------------------
+clone_status() { # product dir -> status text
+  local p="$1" d="$2"
+  [ -d "$d" ] || { printf 'missing'; return; }
+  if [ "$p" = desktop ]; then
+    if command -v pgrep >/dev/null 2>&1 && pgrep -f -- "--user-data-dir=\"?${d}" >/dev/null 2>&1; then printf 'running'; return; fi
+    # only the presence of the token cache is checked, never its value
+    if [ -f "$d/config.json" ] && grep -q '"oauth:tokenCache' "$d/config.json" 2>/dev/null; then printf 'signed in'; return; fi
+    printf 'not signed in'
+  else
+    if [ -f "$d/.credentials.json" ]; then printf 'signed in'
+    elif [ "$OS" = "Darwin" ]; then printf 'see keychain'
+    else printf 'not signed in'; fi
+  fi
+}
+
+show_clones() {
+  if [ ! -s "$MANIFEST" ]; then echo "  No clones yet."; return; fi
+  printf '  %s%-16s %-8s %-14s %s%s\n' "$C_DIM" NAME APP STATUS FOLDER "$C_0"
+  local st col tilde="~"
+  while IFS=$'\t' read -r n p d l s; do
+    st="$(clone_status "$p" "$d")"
+    case "$st" in running) col="$C_GR" ;; "signed in") col="$C_CY" ;; missing) col="$C_YE" ;; *) col="$C_DIM" ;; esac
+    printf '  %-16s %-8s %s%-14s%s %s\n' "$n" "$p" "$col" "$st" "$C_0" "${d/#$HOME/$tilde}"
+  done < "$MANIFEST"
+}
+
 if [ "$LIST" = 1 ]; then
-  if [ ! -s "$MANIFEST" ]; then echo "No clones yet."; exit 0; fi
-  printf '  %-16s %-8s %s\n' NAME PRODUCT FOLDER
-  awk -F '\t' '{ printf "  %-16s %-8s %s\n", $1, $2, $3 }' "$MANIFEST"
+  show_clones
+  exit 0
+fi
+
+if [ -n "$LAUNCH" ]; then
+  found=0
+  while IFS=$'\t' read -r n p d l s; do
+    [ "$n" = "$LAUNCH" ] || continue
+    found=1
+    if [ "$p" = desktop ]; then
+      if [ "$OS" = "Darwin" ]; then open "$l"; else "$l" >/dev/null 2>&1 & fi
+    else
+      "$l"   # Claude Code runs in this terminal
+    fi
+    echo "  started $p clone '$n'"
+  done < "$MANIFEST"
+  [ "$found" = 1 ] || { echo "No clone named '$LAUNCH'."; exit 1; }
   exit 0
 fi
 
@@ -360,6 +402,8 @@ fi
 # ------------------------------------------------------------------------------------------
 printf '\n  %sclaude-clone%s  %sv%s  -  several Claude accounts side by side%s\n' "$C_B" "$C_0" "$C_DIM" "$VERSION" "$C_0"
 printf '  %s------------------------------------------------------------%s\n' "$C_DIM" "$C_0"
+
+if [ -s "$MANIFEST" ]; then step "Your clones"; show_clones; fi
 
 step "Looking for Claude on this machine"
 find_desktop; find_code
