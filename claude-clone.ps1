@@ -35,7 +35,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$Version = '1.0.0'
+$Version = '1.1.0'
 $RawBase = 'https://raw.githubusercontent.com/sfr-development/claude-clone/main'
 
 # ---------------------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ function Resolve-ClaudeDesktop {
     $pkg = Get-AppxPackage -ErrorAction SilentlyContinue | Where-Object {
         $_.Name -like '*Claude*' -and $_.InstallLocation -and (Test-Path (Join-Path $_.InstallLocation 'app\Claude.exe'))
     } | Sort-Object Version -Descending | Select-Object -First 1
-    if ($pkg) { return @{ Exe = (Join-Path $pkg.InstallLocation 'app\Claude.exe'); Kind = 'msix'; Root = $pkg.InstallLocation } }
+    if ($pkg) { return @{ Exe = (Join-Path $pkg.InstallLocation 'app\Claude.exe'); Kind = 'msix'; Root = $pkg.InstallLocation; Pfn = $pkg.PackageFamilyName } }
     $squirrel = Join-Path $env:LOCALAPPDATA 'AnthropicClaude'
     if (Test-Path (Join-Path $squirrel 'claude.exe')) {
         $app = Get-ChildItem $squirrel -Directory -Filter 'app-*' -ErrorAction SilentlyContinue |
@@ -153,7 +153,12 @@ function Resolve-ClaudeCode {
     foreach ($c in @((Join-Path $env:USERPROFILE '.local\bin\claude.exe'), (Join-Path $env:APPDATA 'npm\claude.cmd'))) {
         if (Test-Path $c) { return $c }
     }
-    $bundled = Get-ChildItem (Join-Path $env:APPDATA 'Claude\claude-code') -Recurse -Filter claude.exe -ErrorAction SilentlyContinue |
+    # Claude Desktop ships its own copy. The Microsoft Store version keeps it in its private AppData
+    # (Packages\<family>\LocalCache\Roaming), which normal processes do not see under %APPDATA%.
+    $roots = @(Join-Path $env:APPDATA 'Claude\claude-code')
+    $roots += @(Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Packages') -Directory -Filter 'Claude_*' -ErrorAction SilentlyContinue |
+        ForEach-Object { Join-Path $_.FullName 'LocalCache\Roaming\Claude\claude-code' })
+    $bundled = $roots | Where-Object { Test-Path $_ } | ForEach-Object { Get-ChildItem $_ -Recurse -Filter claude.exe -ErrorAction SilentlyContinue } |
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if ($bundled) { return $bundled.FullName }
     return $null
@@ -163,7 +168,15 @@ function Resolve-ClaudeCode {
 . ([scriptblock]::Create($DesktopResolver))
 . ([scriptblock]::Create($CodeResolver))
 
+# Main Claude Desktop profile. The Microsoft Store (MSIX) version virtualizes %APPDATA%: its real data
+# lives in %LOCALAPPDATA%\Packages\<family>\LocalCache\Roaming\Claude and is invisible to normal processes.
 $MainDesktopData = Join-Path $env:APPDATA 'Claude'
+$probe = Resolve-ClaudeDesktop
+if ($probe -and $probe.Pfn) {
+    $virt = Join-Path $env:LOCALAPPDATA ('Packages\' + $probe.Pfn + '\LocalCache\Roaming\Claude')
+    if (Test-Path $virt) { $MainDesktopData = $virt }
+}
+$DefaultProfileBase = Join-Path $env:USERPROFILE '.claude-clone\profiles'
 $MainCodeConfig = Join-Path $env:USERPROFILE '.claude'
 $DesktopDir = [Environment]::GetFolderPath('Desktop')
 $StartMenuDir = Join-Path ([Environment]::GetFolderPath('Programs')) 'Claude Clones'
@@ -476,8 +489,15 @@ $Names = @($Names | ForEach-Object { $_ -split ',' } | Where-Object { $_ } | For
 $desktopBase = $Path
 $codeBase = $Path
 if (-not $Path) {
-    if ($doDesktop) { $desktopBase = Ask 'Where to store Claude Desktop profiles?' $env:APPDATA }
+    if ($doDesktop) { $desktopBase = Ask 'Where to store Claude Desktop profiles?' $DefaultProfileBase }
     if ($doCode) { $codeBase = Ask 'Where to store Claude Code profiles?' $env:USERPROFILE }
+}
+
+foreach ($b in @($desktopBase, $codeBase)) {
+    if ($b -and ($b -match '(?i)OneDrive|Dropbox|Google Drive|iCloud|Nextcloud')) {
+        Warn "$b looks like a cloud-synced folder. Live app profiles there cause sync conflicts and slow Claude down."
+        if (-not (AskYesNo 'Use it anyway?' $false)) { Say '  Cancelled. Run again and pick a local folder.'; exit 1 }
+    }
 }
 
 $share = -not $NoShareSessions
