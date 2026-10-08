@@ -1,6 +1,6 @@
 <div align="center">
 
-# claude-clone
+<img src="docs/banner.svg" alt="claude-clone - several Claude accounts side by side" width="100%">
 
 **Run several Claude accounts side by side - Claude Desktop and Claude Code, each in its own profile.**
 
@@ -110,6 +110,13 @@ every clone with its status (running, signed in, not signed in, missing folder) 
 plus profiles that something else started with `--user-data-dir`. Navigate with the arrow keys or press
 a number.
 
+<p align="center">
+  <img src="docs/demo.svg" alt="Animated terminal recording of the claude-clone dashboard" width="760">
+</p>
+
+<details>
+<summary>Plain-text version</summary>
+
 ```text
   ╭────────────────────────────────────────────────────────────────────────────╮
   │ claude-clone v1.2.0                   several Claude accounts side by side │
@@ -133,6 +140,8 @@ a number.
      Open a profile folder
      Quit
 ```
+
+</details>
 
 On Windows, clones you created by hand or with an older version are found automatically and added to the list.
 Status checks only look at *whether* a login exists - never at its contents.
