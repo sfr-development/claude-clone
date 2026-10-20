@@ -4,30 +4,36 @@ $cycle = 14.0
 $lh = 21; $x0 = 26; $y0 = 70; $cw = 8.4
 $C = @{ w = '#faf9f5'; g = '#c2c0b6'; d = '#77756e'; cy = '#5fb3c9'; gr = '#4ec27a'; or = '#d97757' }
 $H = [char]0x2500; $V = [char]0x2502
-$dot = [char]0x25CF; $ring = [char]0x25CB
+$dot = [char]0x25CF; $ring = [char]0x25CB; $both = [char]0x2194
 $inner = 70
 $lines = @(
     @{ t = 0;   s = @(@('PS C:\&gt; ', 'd'), @('.\claude-clone.ps1', 'w')); typing = $true },
     @{ t = 2.0; s = @(@(('  ' + [char]0x256D + ([string]$H * $inner) + [char]0x256E), 'd')) },
-    @{ t = 2.0; s = @(@("  $V ", 'd'), @('claude-clone', 'w'), @(' v1.2.0', 'd'), @(((' ' * 13) + "several Claude accounts side by side $V"), 'd')) },
+    @{ t = 2.0; s = @(@("  $V ", 'd'), @('claude-clone', 'w'), @(' v1.3.0', 'd'), @(((' ' * 13) + "several Claude accounts side by side $V"), 'd')) },
     @{ t = 2.0; s = @(@(('  ' + [char]0x2570 + ([string]$H * $inner) + [char]0x256F), 'd')) },
     @{ t = 2.5; s = @(@('  INSTALLED', 'cy')) },
-    @{ t = 2.5; s = @(@("    $dot ", 'gr'), @('Claude Desktop  Microsoft Store   2.26454.2.0', 'g')) },
-    @{ t = 2.5; s = @(@("    $dot ", 'gr'), @('Claude Code     2.1.293  (bundled with Claude Desktop)', 'g')) },
-    @{ t = 3.1; s = @(@('  YOUR CLONES (3)', 'cy')) },
-    @{ t = 3.1; s = @(@('      NAME          APP      STATUS         LAST USED', 'd')) },
-    @{ t = 3.4; s = @(@("    $dot ", 'gr'), @('work          ', 'w'), @('Desktop  ', 'g'), @('running        ', 'gr'), @('just now', 'd')) },
-    @{ t = 3.7; s = @(@("    $dot ", 'cy'), @('client-a      ', 'w'), @('Desktop  ', 'g'), @('signed in      ', 'cy'), @('2 h ago', 'd')) },
-    @{ t = 4.0; s = @(@("    $ring ", 'd'), @('personal      ', 'w'), @('Code     ', 'g'), @('not signed in  ', 'd'), @('-', 'd')) },
-    @{ t = 4.5; s = @(@('  What would you like to do?', 'cy')) }
+    @{ t = 2.5; s = @(@("    $dot ", 'gr'), @('Claude Desktop  Microsoft Store   3.1623.0.0', 'g')) },
+    @{ t = 2.5; s = @(@("    $dot ", 'gr'), @('Claude Code     2.1.304  (bundled with Claude Desktop)', 'g')) },
+    @{ t = 3.0; s = @(@('  MAIN PROFILE (CLAUDE STARTED NORMALLY)', 'cy')) },
+    @{ t = 3.0; s = @(@("    $dot ", 'gr'), @('running       ', 'gr'), @('~\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc', 'd')) },
+    @{ t = 3.2; s = @(@('      Work                  ', 'w'), @('4f1c2a9e  ', 'd'), @('active  ', 'gr'), @('24 sessions', 'g')) },
+    @{ t = 3.4; s = @(@('      Family                ', 'w'), @('9d03b7e1          ', 'd'), @('68 sessions   ', 'g'), @("$both clone family", 'cy')) },
+    @{ t = 3.8; s = @(@('  YOUR CLONES (3)', 'cy')) },
+    @{ t = 3.8; s = @(@('      NAME          APP      STATUS         ACCOUNT         LAST USED', 'd')) },
+    @{ t = 4.0; s = @(@("    $dot ", 'gr'), @('family        ', 'w'), @('Desktop  ', 'g'), @('running        ', 'gr'), @('Family          ', 'g'), @('just now', 'd')) },
+    @{ t = 4.2; s = @(@("    $dot ", 'cy'), @('client-a      ', 'w'), @('Desktop  ', 'g'), @('signed in      ', 'cy'), @('Client A        ', 'g'), @('2 h ago', 'd')) },
+    @{ t = 4.4; s = @(@("    $ring ", 'd'), @('personal      ', 'w'), @('Code     ', 'g'), @('not signed in  ', 'd'), @('-               ', 'd'), @('-', 'd')) },
+    @{ t = 4.8; s = @(@('  HEALTH', 'cy')) },
+    @{ t = 4.8; s = @(@("    $dot ", 'gr'), @('all profiles OK', 'g')) },
+    @{ t = 5.2; s = @(@('  What would you like to do?', 'cy')) }
 )
-$menu = @('Launch a clone', 'Create new clones', 'Remove a clone', 'Repair shortcuts', 'Open a profile folder', 'Quit')
-$tMenu = 4.5
-# rows: lines get a blank row before INSTALLED, YOUR CLONES and the menu title
+$menu = @('Launch', 'Find a session', 'Create new clones', 'Check &amp; repair', 'Sync sessions now', 'Clone settings (label, sync, rename, ...)', 'Name an account', 'Move a profile', 'Back up / restore session lists', 'Remove a clone', 'Open a profile folder', 'Update claude-clone', 'Quit')
+$tMenu = 5.2
+# rows: lines get a blank row before INSTALLED, MAIN PROFILE, YOUR CLONES, HEALTH and the menu title
 $rowOf = @{}
 $row = 0
 for ($i = 0; $i -lt $lines.Count; $i++) {
-    if ($i -in @(1, 4, 7, 12)) { $row++ }
+    if ($i -in @(1, 4, 7, 11, 16, 18)) { $row++ }
     $rowOf[$i] = $row
     $row++
 }
@@ -67,7 +73,7 @@ for ($i = 0; $i -lt $lines.Count; $i++) {
 
 # menu with a moving highlight bar
 $barCls = Add-Appear $tMenu
-$moves = @(@(4.5, 0), @(6.2, 1), @(7.2, 2), @(8.2, 1), @(9.2, 0))
+$moves = @(@(5.2, 0), @(6.6, 1), @(7.6, 2), @(8.6, 3), @(9.6, 1))
 $kf = New-Object Text.StringBuilder
 [void]$kf.Append('@keyframes bar{')
 $prevT = 0; $prevIdx = 0

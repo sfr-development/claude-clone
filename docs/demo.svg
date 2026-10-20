@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="860" height="587" viewBox="0 0 860 587" role="img" aria-label="Animated terminal: the claude-clone dashboard">
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="902" viewBox="0 0 860 902" role="img" aria-label="Animated terminal: the claude-clone dashboard">
 <style>
 text{font-family:'Cascadia Code','JetBrains Mono',Consolas,'DejaVu Sans Mono','Courier New',monospace;font-size:14px}
 .a1{animation:k1 14s linear infinite}@keyframes k1{0%,0.36%{opacity:0}2.14%,92%{opacity:1}97%,100%{opacity:0}}
@@ -10,23 +10,36 @@ text{font-family:'Cascadia Code','JetBrains Mono',Consolas,'DejaVu Sans Mono','C
 .a5{animation:k5 14s linear infinite}@keyframes k5{0%,17.86%{opacity:0}19.64%,92%{opacity:1}97%,100%{opacity:0}}
 .a6{animation:k6 14s linear infinite}@keyframes k6{0%,17.86%{opacity:0}19.64%,92%{opacity:1}97%,100%{opacity:0}}
 .a7{animation:k7 14s linear infinite}@keyframes k7{0%,17.86%{opacity:0}19.64%,92%{opacity:1}97%,100%{opacity:0}}
-.a8{animation:k8 14s linear infinite}@keyframes k8{0%,22.14%{opacity:0}23.93%,92%{opacity:1}97%,100%{opacity:0}}
-.a9{animation:k9 14s linear infinite}@keyframes k9{0%,22.14%{opacity:0}23.93%,92%{opacity:1}97%,100%{opacity:0}}
-.a10{animation:k10 14s linear infinite}@keyframes k10{0%,24.29%{opacity:0}26.07%,92%{opacity:1}97%,100%{opacity:0}}
-.a11{animation:k11 14s linear infinite}@keyframes k11{0%,26.43%{opacity:0}28.21%,92%{opacity:1}97%,100%{opacity:0}}
-.a12{animation:k12 14s linear infinite}@keyframes k12{0%,28.57%{opacity:0}30.36%,92%{opacity:1}97%,100%{opacity:0}}
-.a13{animation:k13 14s linear infinite}@keyframes k13{0%,32.14%{opacity:0}33.93%,92%{opacity:1}97%,100%{opacity:0}}
-.a14{animation:k14 14s linear infinite}@keyframes k14{0%,32.14%{opacity:0}33.93%,92%{opacity:1}97%,100%{opacity:0}}
-.bar{animation:bar 14s steps(1,end) infinite}@keyframes bar{32.14%{transform:translateY(0px)}44.29%{transform:translateY(21px)}51.43%{transform:translateY(42px)}58.57%{transform:translateY(21px)}65.71%{transform:translateY(0px)}100%{transform:translateY(0px)}}
+.a8{animation:k8 14s linear infinite}@keyframes k8{0%,21.43%{opacity:0}23.21%,92%{opacity:1}97%,100%{opacity:0}}
+.a9{animation:k9 14s linear infinite}@keyframes k9{0%,21.43%{opacity:0}23.21%,92%{opacity:1}97%,100%{opacity:0}}
+.a10{animation:k10 14s linear infinite}@keyframes k10{0%,22.86%{opacity:0}24.64%,92%{opacity:1}97%,100%{opacity:0}}
+.a11{animation:k11 14s linear infinite}@keyframes k11{0%,24.29%{opacity:0}26.07%,92%{opacity:1}97%,100%{opacity:0}}
+.a12{animation:k12 14s linear infinite}@keyframes k12{0%,27.14%{opacity:0}28.93%,92%{opacity:1}97%,100%{opacity:0}}
+.a13{animation:k13 14s linear infinite}@keyframes k13{0%,27.14%{opacity:0}28.93%,92%{opacity:1}97%,100%{opacity:0}}
+.a14{animation:k14 14s linear infinite}@keyframes k14{0%,28.57%{opacity:0}30.36%,92%{opacity:1}97%,100%{opacity:0}}
+.a15{animation:k15 14s linear infinite}@keyframes k15{0%,30%{opacity:0}31.79%,92%{opacity:1}97%,100%{opacity:0}}
+.a16{animation:k16 14s linear infinite}@keyframes k16{0%,31.43%{opacity:0}33.21%,92%{opacity:1}97%,100%{opacity:0}}
+.a17{animation:k17 14s linear infinite}@keyframes k17{0%,34.29%{opacity:0}36.07%,92%{opacity:1}97%,100%{opacity:0}}
+.a18{animation:k18 14s linear infinite}@keyframes k18{0%,34.29%{opacity:0}36.07%,92%{opacity:1}97%,100%{opacity:0}}
+.a19{animation:k19 14s linear infinite}@keyframes k19{0%,37.14%{opacity:0}38.93%,92%{opacity:1}97%,100%{opacity:0}}
+.a20{animation:k20 14s linear infinite}@keyframes k20{0%,37.14%{opacity:0}38.93%,92%{opacity:1}97%,100%{opacity:0}}
+.bar{animation:bar 14s steps(1,end) infinite}@keyframes bar{37.14%{transform:translateY(0px)}47.14%{transform:translateY(21px)}54.29%{transform:translateY(42px)}61.43%{transform:translateY(63px)}68.57%{transform:translateY(21px)}100%{transform:translateY(0px)}}
 .press{animation:press 14s linear infinite}@keyframes press{0%,72.86%{fill:#2b6d7e}73.93%{fill:#4aa3bb}75.71%,100%{fill:#2b6d7e}}
-.a15{animation:k15 14s linear infinite}@keyframes k15{0%,32.14%{opacity:0}33.93%,92%{opacity:1}97%,100%{opacity:0}}
-.a16{animation:k16 14s linear infinite}@keyframes k16{0%,32.5%{opacity:0}34.29%,92%{opacity:1}97%,100%{opacity:0}}
-.a17{animation:k17 14s linear infinite}@keyframes k17{0%,32.86%{opacity:0}34.64%,92%{opacity:1}97%,100%{opacity:0}}
-.a18{animation:k18 14s linear infinite}@keyframes k18{0%,33.21%{opacity:0}35%,92%{opacity:1}97%,100%{opacity:0}}
-.a19{animation:k19 14s linear infinite}@keyframes k19{0%,33.57%{opacity:0}35.36%,92%{opacity:1}97%,100%{opacity:0}}
-.a20{animation:k20 14s linear infinite}@keyframes k20{0%,33.93%{opacity:0}35.71%,92%{opacity:1}97%,100%{opacity:0}}
+.a21{animation:k21 14s linear infinite}@keyframes k21{0%,37.14%{opacity:0}38.93%,92%{opacity:1}97%,100%{opacity:0}}
+.a22{animation:k22 14s linear infinite}@keyframes k22{0%,37.5%{opacity:0}39.29%,92%{opacity:1}97%,100%{opacity:0}}
+.a23{animation:k23 14s linear infinite}@keyframes k23{0%,37.86%{opacity:0}39.64%,92%{opacity:1}97%,100%{opacity:0}}
+.a24{animation:k24 14s linear infinite}@keyframes k24{0%,38.21%{opacity:0}40%,92%{opacity:1}97%,100%{opacity:0}}
+.a25{animation:k25 14s linear infinite}@keyframes k25{0%,38.57%{opacity:0}40.36%,92%{opacity:1}97%,100%{opacity:0}}
+.a26{animation:k26 14s linear infinite}@keyframes k26{0%,38.93%{opacity:0}40.71%,92%{opacity:1}97%,100%{opacity:0}}
+.a27{animation:k27 14s linear infinite}@keyframes k27{0%,39.29%{opacity:0}41.07%,92%{opacity:1}97%,100%{opacity:0}}
+.a28{animation:k28 14s linear infinite}@keyframes k28{0%,39.64%{opacity:0}41.43%,92%{opacity:1}97%,100%{opacity:0}}
+.a29{animation:k29 14s linear infinite}@keyframes k29{0%,40%{opacity:0}41.79%,92%{opacity:1}97%,100%{opacity:0}}
+.a30{animation:k30 14s linear infinite}@keyframes k30{0%,40.36%{opacity:0}42.14%,92%{opacity:1}97%,100%{opacity:0}}
+.a31{animation:k31 14s linear infinite}@keyframes k31{0%,40.71%{opacity:0}42.5%,92%{opacity:1}97%,100%{opacity:0}}
+.a32{animation:k32 14s linear infinite}@keyframes k32{0%,41.07%{opacity:0}42.86%,92%{opacity:1}97%,100%{opacity:0}}
+.a33{animation:k33 14s linear infinite}@keyframes k33{0%,41.43%{opacity:0}43.21%,92%{opacity:1}97%,100%{opacity:0}}
 </style>
-<rect width="860" height="587" rx="14" fill="#0f0f0e" stroke="#2c2b28"/>
+<rect width="860" height="902" rx="14" fill="#0f0f0e" stroke="#2c2b28"/>
 <rect width="860" height="38" rx="14" fill="#1c1b19"/>
 <rect y="24" width="860" height="14" fill="#1c1b19"/>
 <circle cx="24" cy="19" r="6" fill="#d97757"/><circle cx="44" cy="19" r="6" fill="#c2a14b"/><circle cx="64" cy="19" r="6" fill="#788c5d"/>
@@ -34,22 +47,35 @@ text{font-family:'Cascadia Code','JetBrains Mono',Consolas,'DejaVu Sans Mono','C
 <text class="a1" x="26" y="70" xml:space="preserve"><tspan fill="#77756e">PS C:\&gt; </tspan><tspan fill="#faf9f5">.\claude-clone.ps1</tspan></text>
 <g class="type"><rect x="93.2" y="55" width="155.2" height="20" fill="#0f0f0e"/><rect class="caret" x="93.2" y="56" width="8" height="17" fill="#d97757"/></g>
 <text class="a2" x="26" y="112" xml:space="preserve"><tspan fill="#77756e">  ╭──────────────────────────────────────────────────────────────────────╮</tspan></text>
-<text class="a3" x="26" y="133" xml:space="preserve"><tspan fill="#77756e">  │ </tspan><tspan fill="#faf9f5">claude-clone</tspan><tspan fill="#77756e"> v1.2.0</tspan><tspan fill="#77756e">             several Claude accounts side by side │</tspan></text>
+<text class="a3" x="26" y="133" xml:space="preserve"><tspan fill="#77756e">  │ </tspan><tspan fill="#faf9f5">claude-clone</tspan><tspan fill="#77756e"> v1.3.0</tspan><tspan fill="#77756e">             several Claude accounts side by side │</tspan></text>
 <text class="a4" x="26" y="154" xml:space="preserve"><tspan fill="#77756e">  ╰──────────────────────────────────────────────────────────────────────╯</tspan></text>
 <text class="a5" x="26" y="196" xml:space="preserve"><tspan fill="#5fb3c9">  INSTALLED</tspan></text>
-<text class="a6" x="26" y="217" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#c2c0b6">Claude Desktop  Microsoft Store   2.26454.2.0</tspan></text>
-<text class="a7" x="26" y="238" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#c2c0b6">Claude Code     2.1.293  (bundled with Claude Desktop)</tspan></text>
-<text class="a8" x="26" y="280" xml:space="preserve"><tspan fill="#5fb3c9">  YOUR CLONES (3)</tspan></text>
-<text class="a9" x="26" y="301" xml:space="preserve"><tspan fill="#77756e">      NAME          APP      STATUS         LAST USED</tspan></text>
-<text class="a10" x="26" y="322" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#faf9f5">work          </tspan><tspan fill="#c2c0b6">Desktop  </tspan><tspan fill="#4ec27a">running        </tspan><tspan fill="#77756e">just now</tspan></text>
-<text class="a11" x="26" y="343" xml:space="preserve"><tspan fill="#5fb3c9">    ● </tspan><tspan fill="#faf9f5">client-a      </tspan><tspan fill="#c2c0b6">Desktop  </tspan><tspan fill="#5fb3c9">signed in      </tspan><tspan fill="#77756e">2 h ago</tspan></text>
-<text class="a12" x="26" y="364" xml:space="preserve"><tspan fill="#77756e">    ○ </tspan><tspan fill="#faf9f5">personal      </tspan><tspan fill="#c2c0b6">Code     </tspan><tspan fill="#77756e">not signed in  </tspan><tspan fill="#77756e">-</tspan></text>
-<text class="a13" x="26" y="406" xml:space="preserve"><tspan fill="#5fb3c9">  What would you like to do?</tspan></text>
-<g class="a14"><g class="bar"><rect class="press" x="34" y="412" width="300" height="20" rx="4" fill="#2b6d7e"/></g></g>
-<text class="a15" x="44" y="427" fill="#faf9f5" xml:space="preserve">Launch a clone</text>
-<text class="a16" x="44" y="448" fill="#faf9f5" xml:space="preserve">Create new clones</text>
-<text class="a17" x="44" y="469" fill="#faf9f5" xml:space="preserve">Remove a clone</text>
-<text class="a18" x="44" y="490" fill="#faf9f5" xml:space="preserve">Repair shortcuts</text>
-<text class="a19" x="44" y="511" fill="#faf9f5" xml:space="preserve">Open a profile folder</text>
-<text class="a20" x="44" y="532" fill="#faf9f5" xml:space="preserve">Quit</text>
+<text class="a6" x="26" y="217" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#c2c0b6">Claude Desktop  Microsoft Store   3.1623.0.0</tspan></text>
+<text class="a7" x="26" y="238" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#c2c0b6">Claude Code     2.1.304  (bundled with Claude Desktop)</tspan></text>
+<text class="a8" x="26" y="280" xml:space="preserve"><tspan fill="#5fb3c9">  MAIN PROFILE (CLAUDE STARTED NORMALLY)</tspan></text>
+<text class="a9" x="26" y="301" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#4ec27a">running       </tspan><tspan fill="#77756e">~\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc</tspan></text>
+<text class="a10" x="26" y="322" xml:space="preserve"><tspan fill="#faf9f5">      Work                  </tspan><tspan fill="#77756e">4f1c2a9e  </tspan><tspan fill="#4ec27a">active  </tspan><tspan fill="#c2c0b6">24 sessions</tspan></text>
+<text class="a11" x="26" y="343" xml:space="preserve"><tspan fill="#faf9f5">      Family                </tspan><tspan fill="#77756e">9d03b7e1          </tspan><tspan fill="#c2c0b6">68 sessions   </tspan><tspan fill="#5fb3c9">↔ clone family</tspan></text>
+<text class="a12" x="26" y="385" xml:space="preserve"><tspan fill="#5fb3c9">  YOUR CLONES (3)</tspan></text>
+<text class="a13" x="26" y="406" xml:space="preserve"><tspan fill="#77756e">      NAME          APP      STATUS         ACCOUNT         LAST USED</tspan></text>
+<text class="a14" x="26" y="427" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#faf9f5">family        </tspan><tspan fill="#c2c0b6">Desktop  </tspan><tspan fill="#4ec27a">running        </tspan><tspan fill="#c2c0b6">Family          </tspan><tspan fill="#77756e">just now</tspan></text>
+<text class="a15" x="26" y="448" xml:space="preserve"><tspan fill="#5fb3c9">    ● </tspan><tspan fill="#faf9f5">client-a      </tspan><tspan fill="#c2c0b6">Desktop  </tspan><tspan fill="#5fb3c9">signed in      </tspan><tspan fill="#c2c0b6">Client A        </tspan><tspan fill="#77756e">2 h ago</tspan></text>
+<text class="a16" x="26" y="469" xml:space="preserve"><tspan fill="#77756e">    ○ </tspan><tspan fill="#faf9f5">personal      </tspan><tspan fill="#c2c0b6">Code     </tspan><tspan fill="#77756e">not signed in  </tspan><tspan fill="#77756e">-               </tspan><tspan fill="#77756e">-</tspan></text>
+<text class="a17" x="26" y="511" xml:space="preserve"><tspan fill="#5fb3c9">  HEALTH</tspan></text>
+<text class="a18" x="26" y="532" xml:space="preserve"><tspan fill="#4ec27a">    ● </tspan><tspan fill="#c2c0b6">all profiles OK</tspan></text>
+<text class="a19" x="26" y="574" xml:space="preserve"><tspan fill="#5fb3c9">  What would you like to do?</tspan></text>
+<g class="a20"><g class="bar"><rect class="press" x="34" y="580" width="300" height="20" rx="4" fill="#2b6d7e"/></g></g>
+<text class="a21" x="44" y="595" fill="#faf9f5" xml:space="preserve">Launch</text>
+<text class="a22" x="44" y="616" fill="#faf9f5" xml:space="preserve">Find a session</text>
+<text class="a23" x="44" y="637" fill="#faf9f5" xml:space="preserve">Create new clones</text>
+<text class="a24" x="44" y="658" fill="#faf9f5" xml:space="preserve">Check &amp; repair</text>
+<text class="a25" x="44" y="679" fill="#faf9f5" xml:space="preserve">Sync sessions now</text>
+<text class="a26" x="44" y="700" fill="#faf9f5" xml:space="preserve">Clone settings (label, sync, rename, ...)</text>
+<text class="a27" x="44" y="721" fill="#faf9f5" xml:space="preserve">Name an account</text>
+<text class="a28" x="44" y="742" fill="#faf9f5" xml:space="preserve">Move a profile</text>
+<text class="a29" x="44" y="763" fill="#faf9f5" xml:space="preserve">Back up / restore session lists</text>
+<text class="a30" x="44" y="784" fill="#faf9f5" xml:space="preserve">Remove a clone</text>
+<text class="a31" x="44" y="805" fill="#faf9f5" xml:space="preserve">Open a profile folder</text>
+<text class="a32" x="44" y="826" fill="#faf9f5" xml:space="preserve">Update claude-clone</text>
+<text class="a33" x="44" y="847" fill="#faf9f5" xml:space="preserve">Quit</text>
 </svg>
