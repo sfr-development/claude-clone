@@ -8,15 +8,17 @@
 #   ./claude-clone.sh                              interactive
 #   ./claude-clone.sh --product desktop --names work,personal --yes
 #   ./claude-clone.sh --list
+#   ./claude-clone.sh --doctor        check every clone, change nothing
+#   ./claude-clone.sh --repair        fix what --doctor finds
 #   ./claude-clone.sh --remove work
 
 set -euo pipefail
 
-VERSION="1.2.0"
+VERSION="1.3.0"
 OS="$(uname -s)"
 
 PRODUCT=""; COUNT=""; NAMES=""; BASE_PATH=""
-SHARE=1; COPY=1; SHORTCUTS=1; MAIN_SHORTCUT=1; YES=0; LIST=0; REMOVE=""; PURGE=0; LAUNCH=""
+SHARE=1; COPY=1; SHORTCUTS=1; MAIN_SHORTCUT=1; YES=0; LIST=0; REMOVE=""; PURGE=0; LAUNCH=""; DOCTOR=0
 
 usage() {
   cat <<'EOF'
@@ -34,6 +36,8 @@ Options:
   --no-shortcuts                no launchers on the desktop / in the app menu
   --no-main-shortcut            no extra launcher for the main account
   --list                        list clones with their status (signed in, running)
+  --doctor                      check every clone (dead links, missing folders), change nothing
+  --repair                      fix what --doctor finds
   --launch NAME                 start a clone
   --remove NAME                 remove a clone (shortcuts and launchers)
   --purge                       with --remove: also delete the profile folder
@@ -52,6 +56,8 @@ while [ $# -gt 0 ]; do
     --no-shortcuts) SHORTCUTS=0; shift ;;
     --no-main-shortcut) MAIN_SHORTCUT=0; shift ;;
     --list) LIST=1; shift ;;
+    --doctor) DOCTOR=1; shift ;;
+    --repair) DOCTOR=2; shift ;;
     --remove) REMOVE="$2"; shift 2 ;;
     --purge) PURGE=1; shift ;;
     --launch) LAUNCH="$2"; shift 2 ;;
@@ -94,7 +100,7 @@ safe_name() { printf '%s' "$1" | sed 's/[^A-Za-z0-9_-]/-/g; s/^-*//; s/-*$//'; }
 # State
 # ------------------------------------------------------------------------------------------
 STATE_DIR="$HOME/.claude-clone"
-MANIFEST="$STATE_DIR/clones.tsv"   # name<TAB>product<TAB>dir<TAB>launcher<TAB>shortcut;shortcut
+MANIFEST="$STATE_DIR/clones.tsv"   # name<TAB>product<TAB>dir<TAB>launcher<TAB>shortcut;shortcut<TAB>share
 BIN_DIR="$HOME/.local/bin"
 mkdir -p "$STATE_DIR"
 touch "$MANIFEST"
@@ -164,17 +170,65 @@ find_code() {
 # ------------------------------------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------------------------------------
-manifest_put() { # name product dir launcher shortcuts
+# Empty fields are written as "-": read with IFS=tab collapses empty fields and would shift the
+# columns that follow
+manifest_put() { # name product dir launcher shortcuts [share]
   local tmp; tmp="$(mktemp)"
   awk -F '\t' -v n="$1" -v p="$2" '!($1 == n && $2 == p)' "$MANIFEST" > "$tmp" || true
-  printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5" >> "$tmp"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "${4:--}" "${5:--}" "${6:--}" >> "$tmp"
   mv "$tmp" "$MANIFEST"
 }
 
+undash() { # after: read -r n p d l s sh
+  [ "${l:-}" = - ] && l=""
+  [ "${s:-}" = - ] && s=""
+  [ "${sh:-}" = - ] && sh=""
+  return 0
+}
+
+# Links only to a folder that exists: never create folders inside the main profile, a link to a
+# folder that is gone shows an empty session list
 link_shared() { # link target
   [ -e "$1" ] || [ -L "$1" ] && return 1
-  mkdir -p "$2"
+  [ -d "$2" ] || return 1
   ln -s "$2" "$1"
+}
+
+is_cloud_path() {
+  case "$1" in
+    */Dropbox|*/Dropbox/*|*/OneDrive*|*/Google\ Drive*|*/Library/Mobile\ Documents/*|*/Library/CloudStorage/*|*/Nextcloud/*|*/ownCloud/*|*/pCloud\ Drive/*) return 0 ;;
+  esac
+  return 1
+}
+
+# Shell code that runs before every start of a Desktop clone: removes links that point to a folder
+# Claude no longer uses and links the main profile's folders again where they exist
+desktop_heal_code() { # dir share
+  cat <<EOF
+d="$1"; m="$MAIN_DATA"; share=$2
+for x in claude-code-sessions claude-code; do
+  if [ -L "\$d/\$x" ] && [ ! -e "\$d/\$x" ]; then rm -f "\$d/\$x"; fi
+  if [ "\$share" = 1 ] && [ ! -e "\$d/\$x" ] && [ ! -L "\$d/\$x" ] && [ -d "\$m/\$x" ]; then ln -s "\$m/\$x" "\$d/\$x"; fi
+done
+EOF
+}
+
+write_desktop_launcher() { # name dir share -> sets LAUNCHER
+  local name="$1" dir="$2" title="Claude ($1)"
+  if [ "$OS" = "Darwin" ]; then
+    LAUNCHER="$HOME/Applications/$title.app"
+    mkdir -p "$HOME/Applications"
+    mac_app_bundle "$LAUNCHER" "# claude-clone $VERSION - Claude Desktop, profile '$name'
+$(desktop_heal_code "$dir" "$3")
+exec open -n -a \"$DESKTOP_APP\" --args --user-data-dir=\"$dir\"" "$DESKTOP_ICON" "$name"
+  else
+    mkdir -p "$BIN_DIR"
+    LAUNCHER="$BIN_DIR/claude-desktop-$name"
+    { printf '#!/usr/bin/env bash\n# claude-clone %s - Claude Desktop, profile '"'"'%s'"'"'\n' "$VERSION" "$name"
+      desktop_heal_code "$dir" "$3"
+      printf 'exec "%s" --user-data-dir="%s" "$@"\n' "$DESKTOP_APP" "$dir"; } > "$LAUNCHER"
+    chmod +x "$LAUNCHER"
+  fi
 }
 
 mac_app_bundle() { # bundle-path title exec-line icon id
@@ -235,20 +289,15 @@ desktop_clone() { # name base
   fi
 
   local launcher title="Claude ($name)"
+  write_desktop_launcher "$name" "$dir" "$SHARE"
+  launcher="$LAUNCHER"
   if [ "$OS" = "Darwin" ]; then
-    launcher="$HOME/Applications/$title.app"
-    mkdir -p "$HOME/Applications"
-    mac_app_bundle "$launcher" "exec open -n -a \"$DESKTOP_APP\" --args --user-data-dir=\"$dir\"" "$DESKTOP_ICON" "$name"
-    ok "app: $launcher"
+    ok "app: $launcher (repairs broken links in the profile before every start)"
     if [ "$SHORTCUTS" = 1 ]; then
       ln -sfn "$launcher" "$DESKTOP_DIR/$title.app" && shortcuts="$DESKTOP_DIR/$title.app" && ok "shortcut: Desktop ('$title')"
     fi
   else
-    mkdir -p "$BIN_DIR"
-    launcher="$BIN_DIR/claude-desktop-$name"
-    printf '#!/usr/bin/env bash\nexec "%s" --user-data-dir="%s" "$@"\n' "$DESKTOP_APP" "$dir" > "$launcher"
-    chmod +x "$launcher"
-    ok "command: claude-desktop-$name"
+    ok "command: claude-desktop-$name (repairs broken links in the profile before every start)"
     if [ "$SHORTCUTS" = 1 ]; then
       local apps="$HOME/.local/share/applications"; mkdir -p "$apps"
       linux_desktop_entry "$apps/claude-clone-$name.desktop" "$title" "$launcher" "$DESKTOP_ICON" false
@@ -260,7 +309,7 @@ desktop_clone() { # name base
       ok "shortcuts: app menu and Desktop ('$title')"
     fi
   fi
-  manifest_put "$name" desktop "$dir" "$launcher" "$shortcuts"
+  manifest_put "$name" desktop "$dir" "$launcher" "$shortcuts" "$SHARE"
 }
 
 code_clone() { # name base
@@ -348,11 +397,65 @@ show_clones() {
   if [ ! -s "$MANIFEST" ]; then echo "  No clones yet."; return; fi
   printf '  %s%-16s %-8s %-14s %s%s\n' "$C_DIM" NAME APP STATUS FOLDER "$C_0"
   local st col tilde="~"
-  while IFS=$'\t' read -r n p d l s; do
+  while IFS=$'\t' read -r n p d l s sh; do
     st="$(clone_status "$p" "$d")"
     case "$st" in running) col="$C_GR" ;; "signed in") col="$C_CY" ;; missing) col="$C_YE" ;; *) col="$C_DIM" ;; esac
     printf '  %-16s %-8s %s%-14s%s %s\n' "$n" "$p" "$col" "$st" "$C_0" "${d/#$HOME/$tilde}"
   done < "$MANIFEST"
+}
+
+# ------------------------------------------------------------------------------------------
+# Doctor / repair
+# ------------------------------------------------------------------------------------------
+doctor() { # 1 = check only, 2 = repair, 3 = check what is left after a repair
+  local issues=0 keep line x name target
+  find_desktop
+  [ -s "$MANIFEST" ] || { echo "  No clones yet."; return 0; }
+  keep="$(mktemp)"
+  while IFS=$'\t' read -r n p d l s sh; do
+    undash
+    if [ ! -d "$d" ]; then
+      warn "$n ($p): profile folder is missing: $d"; issues=$((issues + 1))
+      if [ "$1" = 2 ] && ask_yn "Remove '$n' from the list and delete its launcher and shortcuts?" 1; then
+        IFS=';' read -r -a parts <<< "$s"
+        for x in "${parts[@]:-}"; do [ -n "$x" ] && rm -rf -- "$x"; done
+        [ -n "$l" ] && rm -rf -- "$l"
+        ok "removed '$n' from the list"
+        continue
+      fi
+      printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$p" "$d" "${l:--}" "${s:--}" "${sh:--}" >> "$keep"
+      continue
+    fi
+    if [ "$p" = desktop ]; then
+      # clones from before 1.3.0 did not record whether they share the session list
+      if [ -z "$sh" ]; then if [ -L "$d/claude-code-sessions" ] || [ -L "$d/claude-code" ]; then sh=1; else sh=0; fi; fi
+      for x in "$d"/* "$d"/.[!.]*; do
+        [ -L "$x" ] || continue
+        [ -e "$x" ] && continue
+        name="$(basename "$x")"; target="$(readlink "$x" || true)"
+        warn "$n: '$name' is a dead link to $target"; issues=$((issues + 1))
+        if [ "$1" = 2 ]; then
+          rm -f "$x"
+          if [ -n "$MAIN_DATA" ] && [ -d "$MAIN_DATA/$name" ]; then ln -s "$MAIN_DATA/$name" "$x"; ok "$n: '$name' linked to $MAIN_DATA/$name"
+          else ok "$n: dead link '$name' removed"; fi
+        fi
+      done
+      if [ -n "$l" ] && ! grep -qs "claude-clone $VERSION" "$l" "$l/Contents/MacOS/launch"; then
+        warn "$n: launcher is from an older claude-clone (it does not repair the profile before starting)"; issues=$((issues + 1))
+        if [ "$1" = 2 ] && [ -n "$DESKTOP_APP" ]; then write_desktop_launcher "$n" "$d" "$sh"; l="$LAUNCHER"; ok "$n: launcher updated"; fi
+      fi
+    elif [ -n "$l" ] && [ ! -e "$l" ]; then
+      warn "$n: command $l is missing - run: claude-clone.sh --product code --names $n"; issues=$((issues + 1))
+    fi
+    if is_cloud_path "$d"; then warn "$n: profile is in a cloud-synced folder ($d) - sync conflicts can damage its databases"; issues=$((issues + 1)); fi
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$p" "$d" "${l:--}" "${s:--}" "${sh:--}" >> "$keep"
+  done < "$MANIFEST"
+  if [ "$1" = 2 ]; then mv "$keep" "$MANIFEST"; else rm -f "$keep"; fi
+  if [ "$issues" = 0 ]; then ok "all clones OK"; return 0; fi
+  if [ "$1" = 1 ]; then printf '\n  %s point(s) found. Fix them with: claude-clone.sh --repair\n' "$issues"; return 1; fi
+  if [ "$1" = 3 ]; then printf '\n  %s point(s) need you (see above).\n' "$issues"; return 1; fi
+  step "Checking again"
+  doctor 3
 }
 
 if [ "$LIST" = 1 ]; then
@@ -360,15 +463,21 @@ if [ "$LIST" = 1 ]; then
   exit 0
 fi
 
+if [ "$DOCTOR" != 0 ]; then
+  if [ "$DOCTOR" = 2 ]; then step "Checking and repairing all clones"; else step "Checking all clones (nothing is changed)"; fi
+  if doctor "$DOCTOR"; then exit 0; else exit 1; fi
+fi
+
 if [ -n "$LAUNCH" ]; then
   found=0
-  while IFS=$'\t' read -r n p d l s; do
+  while IFS=$'\t' read -r n p d l s sh; do
     [ "$n" = "$LAUNCH" ] || continue
+    undash
     found=1
     if [ "$p" = desktop ]; then
       if [ "$OS" = "Darwin" ]; then open "$l"; else "$l" >/dev/null 2>&1 & fi
     else
-      "$l"   # Claude Code runs in this terminal
+      "$l" </dev/tty   # Claude Code runs in this terminal (not with the clone list as its input)
     fi
     echo "  started $p clone '$n'"
   done < "$MANIFEST"
@@ -378,8 +487,9 @@ fi
 
 if [ -n "$REMOVE" ]; then
   found=0
-  while IFS=$'\t' read -r n p d l s; do
+  while IFS=$'\t' read -r n p d l s sh; do
     [ "$n" = "$REMOVE" ] || continue
+    undash
     found=1
     step "Removing $p clone '$n'"
     IFS=';' read -r -a parts <<< "$s"
@@ -449,6 +559,11 @@ if [ -z "$BASE_PATH" ]; then
   [ "$DO_CODE" = 1 ] && CODE_BASE="$(ask "Where to store Claude Code profiles?" "$HOME")"
 fi
 DESK_BASE="${DESK_BASE/#\~/$HOME}"; CODE_BASE="${CODE_BASE/#\~/$HOME}"
+for b in "$DESK_BASE" "$CODE_BASE"; do
+  [ -n "$b" ] && is_cloud_path "$b" || continue
+  warn "$b is in a cloud-synced folder. Claude writes its databases there all the time; the sync client can damage them."
+  ask_yn "Use it anyway?" 0 || { echo "  Cancelled. Pick a local folder."; exit 1; }
+done
 
 if [ "$YES" != 1 ]; then
   if [ "$DO_DESKTOP" = 1 ] && [ "$SHARE" = 1 ]; then
